@@ -9,6 +9,7 @@ A proved bound on a word is an upper bound for its length that is guaranteed to 
 @[class] structure ProvedBound (w : Word α) where
   bound : ℕ
   boundproof : w is bounded by bound
+deriving Repr
 
 /-
 Bounds on word lengths that can be deduced directly from the properties of a pseudo length function.
@@ -202,6 +203,8 @@ instance {w : Word α} : Inhabited (ProvedBound w) :=
     }
   ⟩
 
+instance {w : Word α} [inst : Inhabited (ProvedBound w)] : Inhabited (Thunk (ProvedBound w)) := ⟨Thunk.mk (λ _ => inst.default)⟩
+
 end ProvedBound
 
 -- produces a bound with proof for a word
@@ -218,3 +221,15 @@ partial def proveBound : (w : Word α) → ProvedBound w
         )
 
       ProvedBound.minList base boundList
+
+partial def proveBoundThunk : (w : Word α) → Thunk (ProvedBound w)
+  | [] => Thunk.mk (λ _ => ProvedBound.emptyWord)
+  | h :: tail =>
+    Thunk.mk (λ _ => ProvedBound.minList (ProvedBound.prepend h (proveBoundThunk tail).get) (
+    ((ProvedBound.provedSplits h⁻¹ tail ).map (
+      fun
+      | ⟨(fst, snd), prf⟩ =>
+            ProvedBound.headMatches h prf
+              (proveBoundThunk fst).get (proveBoundThunk snd).get
+      )))
+    )

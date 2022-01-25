@@ -16,3 +16,9 @@ protected theorem succ_eq_one_add : ∀ m : Nat, Nat.succ m = (Nat.succ Nat.zero
   λ m => by simp [Nat.succ_add]
 
 end Nat
+
+
+instance : Functor (Thunk) :=
+  {
+    map := (λ f => λ ta => Thunk.mk (λ _ => f ta.get))
+  }

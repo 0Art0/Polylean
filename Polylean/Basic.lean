@@ -14,8 +14,28 @@ inductive Alphabet (α : Type _) [DecidableEq α] where
 -- a type `α` with decidable equality
 variable {α : Type _} [DecidableEq α]
 
+
 -- a proof that `Alphabet α` also has decidable equality
-instance : DecidableEq (Alphabet α) := sorry
+/-
+instance : DecidableEq (Alphabet α)
+    | Alphabet.pos a, Alphabet.pos b =>
+      if h : a = b then
+        Decidable.isTrue (congrArg _ h)
+      else
+        Decidable.isFalse (by simp [h])
+    | Alphabet.pos a, Alphabet.neg b => Decidable.isFalse Alphabet.noConfusion
+    | Alphabet.neg a, Alphabet.pos b => Decidable.isFalse Alphabet.noConfusion
+    | Alphabet.neg a, Alphabet.neg b =>
+      if h : a = b then
+        Decidable.isTrue (congrArg _ h)
+      else
+        Decidable.isFalse (by simp [h])
+-/
+
+instance [decEqα : DecidableEq α] [decFalse : Decidable False]
+  : DecidableEq (Alphabet α) := by
+  intro a b ; cases a <;> cases b <;> simp <;>
+    first | exact decFalse | exact decEqα _ _
 
 -- inverse of an alphabet
 def Alphabet.inv : Alphabet α → Alphabet α
@@ -111,7 +131,7 @@ class PseudoLengthFunction (ℓ : FreeGroupLength α) where
 A length bound on a word is an upper bound for the value of any pseudo length function on the given word.
 -/
 @[reducible] abbrev lengthBound (w : Word α) (bound : ℕ) :=
-  ∀ {ℓ : FreeGroupLength α} [PseudoLengthFunction ℓ], ℓ (w) ≤ bound
+  ∀ (ℓ : FreeGroupLength α) [PseudoLengthFunction ℓ], ℓ (w) ≤ bound
 
 -- convenient notation
 infix:100 " is bounded by " => lengthBound
