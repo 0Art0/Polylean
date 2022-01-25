@@ -32,14 +32,14 @@ It is convenient to think of it as a list of elements of type `Alphabet α`, as 
 abbrev Word (α : Type _) [DecidableEq α] := List (Alphabet α)
 
 -- powers of a group element
-def Word.pow : Word α → ℕ → Word α
+@[reducible] def Word.pow : Word α → ℕ → Word α
   | w, Nat.zero   => []
   | w, Nat.succ m => w ++ (pow w m)
 
 instance : Pow (Word α) ℕ := ⟨Word.pow⟩
 
 -- conjugation of a word by a generator
-def Word.conj : Word α → Alphabet α → Word α
+@[reducible] def Word.conj : Word α → Alphabet α → Word α
   | w, l => [l] ++ w ++ [l⁻¹]
 
 instance : Pow (Word α) (Alphabet α) := ⟨Word.conj⟩
@@ -110,7 +110,7 @@ class PseudoLengthFunction (ℓ : FreeGroupLength α) where
 /-
 A length bound on a word is an upper bound for the value of any pseudo length function on the given word.
 -/
-abbrev lengthBound (w : Word α) (bound : ℕ) :=
+@[reducible] abbrev lengthBound (w : Word α) (bound : ℕ) :=
   ∀ {ℓ : FreeGroupLength α} [PseudoLengthFunction ℓ], ℓ (w) ≤ bound
 
 -- convenient notation
