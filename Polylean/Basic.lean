@@ -9,13 +9,17 @@ Terms of the form `pos a` (where `a : α`) indicate the generators while terms o
 inductive Alphabet (α : Type _) [DecidableEq α] where
   | pos : α → Alphabet α
   | neg : α → Alphabet α
-  deriving Repr --, DecidableEq
+  deriving Repr
 
 -- a type `α` with decidable equality
 variable {α : Type _} [DecidableEq α]
 
+
 -- a proof that `Alphabet α` also has decidable equality
-instance : DecidableEq (Alphabet α) := sorry
+instance [decEqα : DecidableEq α] [decFalse : Decidable False]
+  : DecidableEq (Alphabet α) := by
+  intro a b ; cases a <;> cases b <;> simp <;>
+    first | exact decFalse | exact decEqα _ _
 
 -- inverse of an alphabet
 def Alphabet.inv : Alphabet α → Alphabet α
@@ -45,6 +49,7 @@ instance : Pow (Word α) ℕ := ⟨Word.pow⟩
 instance : Pow (Word α) (Alphabet α) := ⟨Word.conj⟩
 
 /-
+TODO Rewrite as an inductive definition
 Reduces a word once by cancelling adjacent elements that are inverses of each other.
 -/
 def Word.reduceStep : Word α → Word α
@@ -79,15 +84,6 @@ def Word.equiv : Word α → Word α → Prop
 -- notation, typed `\sim`
 infix:100 " ∼ " => Word.equiv
 
-/-
-A proved split of a word `w` at a letter `l` is a pair of words `(fst, snd)` such that `w` splits into `fst` and `snd` at `l`.
-abbrev ProvedSplit (l : Alphabet α) (w : Word α) :=
-  {
-  wordpair : Word α × Word α //
-  w = wordpair.fst ++ [l] ++ wordpair.snd
-  }
--/
-
 abbrev FreeGroupLength (α : Type _) [DecidableEq α] := Word α → ℕ
 
 /-
@@ -111,13 +107,7 @@ class PseudoLengthFunction (ℓ : FreeGroupLength α) where
 A length bound on a word is an upper bound for the value of any pseudo length function on the given word.
 -/
 @[reducible] abbrev lengthBound (w : Word α) (bound : ℕ) :=
-  ∀ {ℓ : FreeGroupLength α} [PseudoLengthFunction ℓ], ℓ (w) ≤ bound
+  ∀ (ℓ : FreeGroupLength α) [PseudoLengthFunction ℓ], ℓ (w) ≤ bound
 
 -- convenient notation
 infix:100 " is bounded by " => lengthBound
-
-/-
-A proved bound on a word is an upper bound for its length that is guaranteed to word for any pseudo length function.
-abbrev ProvedBound (w : Word α) :=
-  { bound : ℕ  //  w is bounded by bound }
--/
