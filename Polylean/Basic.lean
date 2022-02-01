@@ -16,10 +16,9 @@ variable {α : Type _} [DecidableEq α]
 
 
 -- a proof that `Alphabet α` also has decidable equality
-instance [decEqα : DecidableEq α] [decFalse : Decidable False]
-  : DecidableEq (Alphabet α) := by
+instance : DecidableEq (Alphabet α) := by
   intro a b ; cases a <;> cases b <;> simp <;>
-    first | exact decFalse | exact decEqα _ _
+    exact inferInstance
 
 -- inverse of an alphabet
 def Alphabet.inv : Alphabet α → Alphabet α
@@ -43,10 +42,14 @@ abbrev Word (α : Type _) [DecidableEq α] := List (Alphabet α)
 instance : Pow (Word α) ℕ := ⟨Word.pow⟩
 
 -- conjugation of a word by a generator
-@[reducible] def Word.conj : Word α → Alphabet α → Word α
+@[reducible, simp] def Word.conj : Word α → Alphabet α → Word α
   | w, l => [l] ++ w ++ [l⁻¹]
 
 instance : Pow (Word α) (Alphabet α) := ⟨Word.conj⟩
+
+instance : DecidableEq (Word α) := by
+  intro w₁ w₂
+  cases w₁ <;> cases w₂ <;> simp <;> exact inferInstance
 
 /-
 TODO Rewrite as an inductive definition
