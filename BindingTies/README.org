@@ -2,6 +2,8 @@
 
 This folder contains a (work-in-progress) formalisation of [[https://en.wikipedia.org/wiki/Grushko_theorem#Sketch_of_Stalling's_proof][Stallings' topological proof of Grushko's theorem]] using binding ties. Stallings' proof is constructive for finitely-generated groups, and one of the primary aims of this formalisation is to implement the binding tie algorithm and prove its correctness. One of the long-term goals is to also have visualisation accompanying the execution of the algorithm through [[https://leanprover.github.io/lean4/doc/examples/widgets.lean.html][Lean widgets]].
 
+The `Complexes` folder of this repository contains related code, but in a more experimental and preliminary stage.
+
 ** The statement
 
 Grushko's theorem states that for any finitely-generated free group $F$ and finitely-generated groups $A$ and $B$, if $\phi : F \to A \star B$ is a surjective homomorphism, then $F$ splits, i.e., there are subgroups $F_{A}$ and $F_{B}$ of $F$ such that $F = F_{A} \star F_{B}$ such that $\phi(F_{A}) = A$ and $\phi(F_{B}) = B$.
